@@ -1,0 +1,21 @@
+html,
+body {
+  background-color: #f0f0f0;
+}
+
+.holder {
+  margin: 0 auto;
+  max-width: 900px;
+}
+
+.icon-barcode {
+  width: 130px;
+}
+
+.icon-barcode img {
+  width: 100%;
+}
+
+textarea {
+  resize: none;
+}
