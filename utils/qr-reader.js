@@ -1,13 +1,13 @@
 const { PDF_QR_JS } = require("pdf-qr");
 
-const readQR = (filePath, fileName) =>
+const readQR = (filePath) =>
   new Promise((res, rej) => {
     const configs = {
       scale: {
         once: false,
         value: 1,
         start: 1,
-        step: 1.5,
+        step: 1,
         stop: 5,
       },
       resultOpts: {

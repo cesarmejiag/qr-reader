@@ -30,20 +30,29 @@ app.post("/upload-data", async (req, res) => {
   } else {
     const id = uuid();
     const fileExt = path.extname(file.name);
+    const fp = `${filesPath}/${id}-${file.name}`;
 
-    if (fileExt.indexOf("pdf") >= 0) {
-      const fp = `${filesPath}/${id}-${file.name}`;
-
-      try {
-        await file.mv(fp);
+    try {
+      await file.mv(fp);
+      if (
+        fileExt.indexOf("jpg") >= 0 ||
+        fileExt.indexOf("jpeg") >= 0 ||
+        fileExt.indexOf("png") >= 0
+      ) {
+        const [, pdfPath] = await generatePDF(fp, filesPath);
+        const data = await readQR(pdfPath);
+        fs.unlinkSync(fp);
+        // fs.unlinkSync(pdfPath);
+        response = { success: true, data: { file: file.name, ...data } };
+      } else if (fileExt.indexOf("pdf") >= 0) {
         const data = await readQR(fp);
         fs.unlinkSync(fp);
         response = { success: true, data: { file: file.name, ...data } };
-      } catch (err) {
-        response = { success: false, message: err };
+      } else {
+        response = { success: false, message: "Invalid format file" };
       }
-    } else {
-      response = { success: false, message: "Invalid format file" };
+    } catch (err) {
+      response = { success: false, message: err };
     }
   }
 
