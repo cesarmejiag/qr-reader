@@ -1,10 +1,14 @@
+:root {
+  --cyborg-color: #e8511d;
+}
+
 html,
 body {
   background-color: #f0f0f0;
 }
 
 .cyborg-color {
-  color: #e8511d;
+  color: var(--cyborg-color);
 }
 
 .cyborg-btn-primary,
@@ -12,19 +16,19 @@ body {
 .cyborg-btn-primary:disabled,
 .cyborg-btn-primary:focus,
 .cyborg-btn-primary:hover {
-  border-color: #e8511d;
-  background-color: #e8511d;
+  border-color: var(--cyborg-color);
+  background-color: var(--cyborg-color);
 }
 
 .cyborg-btn-secondary {
-  border-color: #e8511d;
-  color: #e8511d;
+  border-color: var(--cyborg-color);
+  color: var(--cyborg-color);
 }
 
 .cyborg-btn-secondary:focus,
 .cyborg-btn-secondary:hover {
-  border-color: #e8511d;
-  background-color: #e8511d;
+  border-color: var(--cyborg-color);
+  background-color: var(--cyborg-color);
 }
 
 .holder {
