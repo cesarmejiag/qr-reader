@@ -3,9 +3,43 @@ body {
   background-color: #f0f0f0;
 }
 
+.cyborg-color {
+  color: #e8511d;
+}
+
+.cyborg-btn-primary,
+.cyborg-btn-primary.disabled,
+.cyborg-btn-primary:disabled,
+.cyborg-btn-primary:focus,
+.cyborg-btn-primary:hover {
+  border-color: #e8511d;
+  background-color: #e8511d;
+}
+
+.cyborg-btn-secondary {
+  border-color: #e8511d;
+  color: #e8511d;
+}
+
+.cyborg-btn-secondary:focus,
+.cyborg-btn-secondary:hover {
+  border-color: #e8511d;
+  background-color: #e8511d;
+}
+
 .holder {
   margin: 0 auto;
   max-width: 900px;
+}
+
+.logo {
+  max-width: 300px
+}
+
+.logo img {
+  display: block;
+  height: auto;
+  width: 100%;
 }
 
 .icon-barcode {

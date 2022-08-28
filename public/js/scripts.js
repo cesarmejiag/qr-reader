@@ -40,7 +40,7 @@
       .map(
         (barcode, index) => `
       <div class="py-4 border-bottom">
-        <div class="mb-2"><b>Page ${index + 1}</b></div>
+        <div class="mb-2"><b clas="cyborg-color">Page ${index + 1}</b></div>
         <div>
           <textarea class="form-control" disabled readonly>${barcode}</textarea>
         </div>
