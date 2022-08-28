@@ -3,7 +3,13 @@
     (context || document).querySelector(selector);
 
   const log = (...params) => {
-    "console" in window && console.log(params);
+    if ("console" in window) {
+      const [action, category, label] = params;
+      console.log(`[${action}] ${category} - ${label}`);
+      if ((action, category, label)) {
+        gtag("event", action, { category, label });
+      }
+    }
   };
 
   const form = q(".form");
@@ -48,9 +54,16 @@
     `
       )
       .join("");
+
+    log(
+      "show",
+      "results",
+      barcodes.length ? `found (${barcodes.length})` : "none"
+    );
   };
 
   const showForm = () => {
+    log("form", "visibility", "show form");
     results.classList.add("d-none");
     form.classList.remove("d-none");
     resetResults();
@@ -74,8 +87,9 @@
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
+    log("submit", "form", "start");
     if (form.checkValidity()) {
+      log("submit", "form", "valid form");
       const barcodeValue = q("input[name=barcode-input]:checked", form).value;
       const fileValue = q("input[name=file-input]", form).files[0];
       const formData = new FormData();
@@ -85,6 +99,7 @@
 
       showLaoder(true);
 
+      log("request", "upload-data", "start");
       fetch("/upload-data", {
         method: "POST",
         body: formData,
@@ -93,17 +108,21 @@
         .then((json) => {
           const { success, data, message } = json;
           if (success) {
+            log("response", "upload-data", "success");
             showResults(data);
           } else {
+            log("response", "upload-data", "failure - " + message);
             showAlert(message);
           }
           showLaoder(false);
         })
         .catch((err) => {
+          log("response", "upload-data", "failure - " + err);
           showAlert(err);
           showLaoder(false);
         });
     } else {
+      log("submit", "form", "invalid form");
     }
 
     form.classList.add("was-validated");

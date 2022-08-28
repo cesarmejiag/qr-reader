@@ -8,7 +8,7 @@ const readQR = (filePath) =>
         value: 1,
         start: 1,
         step: 1,
-        stop: 5,
+        stop: 10,
       },
       resultOpts: {
         singleCodeInPage: true,
