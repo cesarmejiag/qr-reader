@@ -4,6 +4,7 @@ const fs = require("fs");
 const express = require("express");
 const fileUpload = require("express-fileupload");
 const bodyParser = require("body-parser");
+const timeout = require("connect-timeout");
 
 const { getId, isImage, isValidFile, resolvePath } = require("./utils/utils");
 const generatePDF = require("./utils/generate-pdf");
@@ -17,6 +18,7 @@ const filesPath = resolvePath(__dirname, "./files");
 app.use(fileUpload({ createParentPath: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(timeout('300s'));
 app.use(express.static("public"));
 
 app.post("/upload-data", async (req, res) => {
