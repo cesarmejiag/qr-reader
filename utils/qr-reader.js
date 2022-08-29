@@ -4,11 +4,11 @@ const readQR = (filePath) =>
   new Promise((res, rej) => {
     const configs = {
       scale: {
-        once: false,
-        value: 1,
+        once: true,
+        value: 5,
         start: 1,
         step: 1,
-        stop: 10,
+        stop: 6,
       },
       resultOpts: {
         singleCodeInPage: true,
