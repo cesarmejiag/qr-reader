@@ -5,12 +5,12 @@ const getId = () => uuid();
 
 const isImage = (fileName) => {
   const imageExt = [".jpg", ".jpeg", ".png"];
-  const ext = path.extname(fileName);
+  const ext = path.extname(fileName).toLocaleLowerCase();
   return imageExt.indexOf(ext) >= 0;
 };
 
 const isPdf = (fileName) => {
-  const ext = path.extname(fileName);
+  const ext = path.extname(fileName).toLowerCase();
   return ext.indexOf(".pdf") >= 0;
 };
 

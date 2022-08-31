@@ -104,7 +104,12 @@
         method: "POST",
         body: formData,
       })
-        .then((res) => res.json())
+        .then((res) => {
+          if (res.status === 503) {
+            throw "Processing time exceeded.";
+          }
+          return res.json();
+        })
         .then((json) => {
           const { success, data, message } = json;
           if (success) {

@@ -4,7 +4,7 @@ const readQR = (filePath) =>
   new Promise((res, rej) => {
     const configs = {
       scale: {
-        once: true,
+        once: false,
         value: 5,
         start: 1,
         step: 1,
