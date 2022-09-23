@@ -112,11 +112,14 @@
         })
         .then((json) => {
           const { success, data, message } = json;
-          if (!success) {
+          if (success) {
+            log("response", "upload-data", "success");
+            showResults(data);
+          } else {
             log("response", "upload-data", "failure - " + message);
-            showLaoder(false);
             showAlert(message);
           }
+          showLaoder(false);
         })
         .catch((err) => {
           log("response", "upload-data", "failure - " + err);
@@ -133,16 +136,4 @@
   form.addEventListener("submit", handleSubmit);
   newBtn.addEventListener("click", showForm);
 
-  // Sockets
-  var socket = io();
-  socket.on("read", ({ success, data, message }) => {
-    if (success) {
-      log("response", "upload-data", "success");
-      showResults(data);
-    } else {
-      log("response", "upload-data", "failure - " + message);
-      showAlert(message);
-    }
-    showLaoder(false);
-  });
 })();
