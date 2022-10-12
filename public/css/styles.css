@@ -37,7 +37,7 @@ body {
 }
 
 .logo {
-  max-width: 300px
+  max-width: 300px;
 }
 
 .logo img {
@@ -54,6 +54,20 @@ body {
   width: 100%;
 }
 
+.results .image {
+  margin: 0 auto;
+  max-width: 150px;
+}
+
+.page-ratio {
+  aspect-ratio: auto 612 / 1008;
+}
+
 textarea {
   resize: none;
+}
+
+textarea.loading {
+  background: no-repeat center center transparent url("../imgs/loader.svg");
+  background-size: 40px 40px;
 }

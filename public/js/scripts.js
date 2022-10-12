@@ -1,4 +1,5 @@
 (() => {
+  // Utils
   const q = (selector, context) =>
     (context || document).querySelector(selector);
 
@@ -12,15 +13,19 @@
     }
   };
 
+  const validImageFormats = () => {};
+
+  const validFormats = () => {};
+
   const form = q(".form");
   const results = q(".results");
   const resultsList = q(".list", results);
   const newBtn = q("button", results);
 
   const resetResults = () => {
-    q(".results-name", results).innerText = "";
-    q(".results-pages", results).innerText = "";
-    q(".results-barcodes", results).innerText = "";
+    q(".results-name", results).innerText = "Cargando...";
+    q(".results-pages", results).innerText = "Cargando...";
+    q(".results-barcodes", results).innerText = "Cargando...";
     resultsList.innerHTML = "";
   };
 
@@ -28,38 +33,9 @@
     const alert = document.createElement("div");
     alert.innerHTML = `<div class="alert alert-danger" role="alert">${message}</div>`;
     form.append(alert);
-
     setTimeout(() => {
       form.removeChild(alert);
     }, 3000);
-  };
-
-  const showResults = ({ file, pages, barcodes }) => {
-    form.classList.add("d-none");
-    results.classList.remove("d-none");
-
-    q(".results-name", results).innerText = file;
-    q(".results-pages", results).innerText = pages;
-    q(".results-barcodes", results).innerText = barcodes.length;
-
-    resultsList.innerHTML = barcodes
-      .map(
-        (barcode, index) => `
-      <div class="py-4 border-bottom">
-        <div class="mb-2"><b clas="cyborg-color">Page ${index + 1}</b></div>
-        <div>
-          <textarea class="form-control" disabled readonly>${barcode}</textarea>
-        </div>
-      </div>
-    `
-      )
-      .join("");
-
-    log(
-      "show",
-      "results",
-      barcodes.length ? `found (${barcodes.length})` : "none"
-    );
   };
 
   const showForm = () => {
@@ -69,20 +45,56 @@
     resetResults();
   };
 
-  const showLaoder = (loading) => {
-    const button = q("button[type=submit]", form);
-    button.disabled = loading;
-    if (loading) {
-      button.innerHTML = `
-        <span
-          class="spinner-border spinner-border-sm"
-          role="status"
-          aria-hidden="true"></span>
-        Loading...
-      `;
+  const showImageResult = (image, pageNumber) => {
+    const row = document.createElement("div");
+    row.className += "result-row py-4 border-bottom";
+    row.innerHTML = `
+      <div class="mb-2"><b clas="cyborg-color">Page ${pageNumber}</b></div>
+        <div class="row">
+          <div class="col-12 col-sm-4">
+            <div class="image ratio page-ratio mb-2"></div>
+          </div>
+          <div class="col-12 col-sm-8">
+            <textarea class="form-control loading" disabled readonly></textarea>
+          </div>
+        </div>
+      </div>
+    `;
+
+    q(".image", row).appendChild(image);
+    resultsList.appendChild(row);
+  };
+
+  const showResults = ({ success, codes, codesByPage }) => {
+    if (success) {
+      // Fill result rows.
+      let counter = 1;
+      codesByPage.forEach((code) => {
+        if (code instanceof Array) {
+          const textarea = q(
+            `.result-row:nth-child(${counter++}) textarea`,
+            resultsList
+          );
+          textarea.classList.remove("loading");
+          textarea.value = code.length > 0 ? code[0] : "No se encontró código";
+        }
+      });
+
+      // Fill resume results.
+      q(".results-pages", results).innerText = codesByPage.filter(
+        (code) => code instanceof Array > 0
+      ).length;
+      q(".results-barcodes", results).innerText = codes.length;
     } else {
-      button.innerHTML = "Read";
+      // Show error message.
     }
+    newBtn.disabled = false;
+  };
+
+  const showResultsPage = (fileName) => {
+    form.classList.add("d-none");
+    results.classList.remove("d-none");
+    q(".results-name", results).innerText = fileName;
   };
 
   const handleSubmit = (event) => {
@@ -91,41 +103,37 @@
     if (form.checkValidity()) {
       log("submit", "form", "valid form");
       const barcodeValue = q("input[name=barcode-input]:checked", form).value;
-      const fileValue = q("input[name=file-input]", form).files[0];
-      const formData = new FormData();
+      const fileInput = q("input[name=file-input]", form);
 
-      formData.append("barcode", barcodeValue);
-      formData.append("file", fileValue);
+      showResultsPage(fileInput.files[0].name);
+      newBtn.disabled = true;
+      if (barcodeValue === "qrcode") {
+        const configs = {
+          scale: {
+            once: false,
+            value: 1,
+            start: 2,
+            step: 2,
+            stop: 6,
+          },
+          resultOpts: {
+            singleCodeInPage: true,
+            multiCodesInPage: false,
+            maxCodesInPage: 1,
+          },
+          improve: true,
+          jsQR: {},
+        };
 
-      showLaoder(true);
-
-      log("request", "upload-data", "start");
-      fetch("/upload-data", {
-        method: "POST",
-        body: formData,
-      })
-        .then((res) => {
-          if (res.status === 503) {
-            throw "Processing time exceeded.";
-          }
-          return res.json();
-        })
-        .then((json) => {
-          const { success, data, message } = json;
-          if (success) {
-            log("response", "upload-data", "success");
-            showResults(data);
-          } else {
-            log("response", "upload-data", "failure - " + message);
-            showAlert(message);
-          }
-          showLaoder(false);
-        })
-        .catch((err) => {
-          log("response", "upload-data", "failure - " + err);
-          showAlert(err);
-          showLaoder(false);
-        });
+        PDF_QR_JS.decodeDocument(
+          fileInput,
+          configs,
+          showResults,
+          showImageResult
+        );
+      } else {
+        // TODO: Implement
+      }
     } else {
       log("submit", "form", "invalid form");
     }
@@ -135,5 +143,4 @@
 
   form.addEventListener("submit", handleSubmit);
   newBtn.addEventListener("click", showForm);
-
 })();

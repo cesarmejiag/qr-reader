@@ -95,13 +95,13 @@
             </div>
           </form>
           <div class="results d-none">
-            <header>
-              <h2 class="cyborg-color">Results</h2>
-              <div>File: <span class="results-name"></span></div>
-              <div>Pages: <span class="results-pages"></span></div>
-              <div>Barcodes: <span class="results-barcodes"></span></div>
-            </header>
             <div class="list pb-4"></div>
+            <footer class="mb-4">
+              <h2 class="cyborg-color">Results</h2>
+              <div>File: <span class="results-name">Cargando...</span></div>
+              <div>Pages: <span class="results-pages">Cargando...</span></div>
+              <div>Barcodes: <span class="results-barcodes">Cargando...</span></div>
+            </footer>
             <div class="d-flex justify-content-end">
               <button type="button" class="btn btn-outline-secondary cyborg-btn-secondary">
                 New document
@@ -111,6 +111,9 @@
         </div>
       </div>
     </div>
+    <script src="./js/vendor/pdf-qr/jsQR.js"></script>
+    <script src="./js/vendor/pdf-qr/pdf.min.js"></script>
+    <script src="./js/vendor/pdf-qr/pdf-qr.js"></script>
     <script src="./js/scripts.js"></script>
   </body>
 </html>
