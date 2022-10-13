@@ -1,8 +1,20 @@
 (() => {
-  // Utils
+  // PDFJS.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS.version}/pdf.worker.min.js`;
+  PDFJS.GlobalWorkerOptions.workerSrc = `/js/vendor/pdf.worker.min.js`;
+
+  /**
+   * Shortcut of querySelector.
+   * @param {string} selector
+   * @param {HTMLElement|Node} context
+   * @returns {HTMLElment|null}
+   */
   const q = (selector, context) =>
     (context || document).querySelector(selector);
 
+  /**
+   * Log and report to google analytics.
+   * @param  {...any} params
+   */
   const log = (...params) => {
     if ("console" in window) {
       const [action, category, label] = params;
@@ -13,9 +25,42 @@
     }
   };
 
-  const validImageFormats = () => {};
+  /**
+   * Validate if file is a pdf.
+   * @param {File} file
+   * @returns {boolean}
+   */
+  const isValidPdf = (file) => {
+    if (file) {
+      const allowed = ["pdf"];
+      const ext = file.name.match(/\.(.+)/);
+      return ext[1] && allowed.includes(ext[1]);
+    }
+    return false;
+  };
 
-  const validFormats = () => {};
+  /**
+   * Validate if file is an image.
+   * @param {File} file
+   * @returns {boolean}
+   */
+  const isValidImage = (file) => {
+    if (file) {
+      const allowed = ["jpg", "jpeg", "png"];
+      const ext = file.name.match(/\.(.+)/);
+      return ext[1] && allowed.includes(ext[1]);
+    }
+    return false;
+  };
+
+  /**
+   * Validate if file is pdf or image.
+   * @param {File} file
+   * @returns {boolean}
+   */
+  const isValidFile = (file) => {
+    return isValidPdf(file) || isValidImage(file);
+  };
 
   const form = q(".form");
   const results = q(".results");
@@ -97,42 +142,48 @@
     q(".results-name", results).innerText = fileName;
   };
 
+  const readQR = (fileInput) => {
+    const configs = {
+      scale: {
+        once: false,
+        value: 1,
+        start: 2,
+        step: 2,
+        stop: 6,
+      },
+      resultOpts: {
+        singleCodeInPage: true,
+        multiCodesInPage: false,
+        maxCodesInPage: 1,
+      },
+      improve: true,
+      jsQR: {},
+    };
+
+    PDF_QR_JS.decodeDocument(fileInput, configs, showResults, showImageResult);
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     log("submit", "form", "start");
     if (form.checkValidity()) {
-      log("submit", "form", "valid form");
+      // log("submit", "form", "valid form");
       const barcodeValue = q("input[name=barcode-input]:checked", form).value;
       const fileInput = q("input[name=file-input]", form);
+      const file = fileInput.files[0];
 
-      showResultsPage(fileInput.files[0].name);
-      newBtn.disabled = true;
-      if (barcodeValue === "qrcode") {
-        const configs = {
-          scale: {
-            once: false,
-            value: 1,
-            start: 2,
-            step: 2,
-            stop: 6,
-          },
-          resultOpts: {
-            singleCodeInPage: true,
-            multiCodesInPage: false,
-            maxCodesInPage: 1,
-          },
-          improve: true,
-          jsQR: {},
-        };
-
-        PDF_QR_JS.decodeDocument(
-          fileInput,
-          configs,
-          showResults,
-          showImageResult
-        );
+      if (isValidPdf(file)) {
+        showResultsPage(fileInput.files[0].name);
+        newBtn.disabled = true;
+        if (barcodeValue === "qrcode") {
+          readQR(fileInput);
+        } else {
+          // Implement.
+        }
+      } else if (isValidImage(file)) {
+        // Implement
       } else {
-        // TODO: Implement
+        showAlert("Invalid format file");
       }
     } else {
       log("submit", "form", "invalid form");
