@@ -163,6 +163,49 @@
     PDF_QR_JS.decodeDocument(fileInput, configs, showResults, showImageResult);
   };
 
+  const readBarcode = (fileInput) => {
+    const configs = {
+      scale: {
+        once: false,
+        value: 3,
+        start: 1,
+        step: 1,
+        stop: 10,
+      },
+      resultOpts: {
+        singleCodeInPage: true,
+        multiCodesInPage: false,
+        maxCodesInPage: 1,
+      },
+      patches: ["x-small", "small", "medium", "large", "x-large"],
+      improve: true,
+      noisify: true,
+      quagga: {
+        inputStream: {},
+        locator: {
+          halfSample: true,
+        },
+        decoder: {
+          readers: [
+            "code_128_reader",
+            "code_39_reader",
+            "code_39_vin_reader",
+            "code_93_reader",
+          ],
+          multiple: true,
+        },
+        locate: true,
+      },
+    };
+
+    PDFBarcodeJs.decodeDocument(
+      fileInput,
+      configs,
+      showResults,
+      showImageResult
+    );
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     log("submit", "form", "start");
@@ -178,7 +221,7 @@
         if (barcodeValue === "qrcode") {
           readQR(fileInput);
         } else {
-          // Implement.
+          readBarcode(fileInput);
         }
       } else if (isValidImage(file)) {
         // Implement
