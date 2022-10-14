@@ -1,7 +1,8 @@
 const express = require("express");
+const cors = require("cors");
 const fileUpload = require("express-fileupload");
 const bodyParser = require("body-parser");
-const imgToPdfrouter = require("../routes/imageToPdf");
+const fileRouter = require("../routes/file");
 
 class Server {
   static _instance = null;
@@ -17,7 +18,7 @@ class Server {
     this._app = express();
     this._port = process.env.PORT || 3333;
     this._apiPaths = {
-      "image-to-pdf": imgToPdfrouter,
+      file: fileRouter,
     };
 
     this._initMiddlewares();
@@ -25,6 +26,9 @@ class Server {
   }
 
   _initMiddlewares() {
+    // Configure cors.
+    this._app.use(cors());
+
     // Configure public folder.
     this._app.use(express.static("public"));
 

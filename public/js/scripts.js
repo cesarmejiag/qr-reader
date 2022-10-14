@@ -50,6 +50,22 @@
     resultsList.appendChild(row);
   };
 
+  const showLaoder = (loading) => {
+    const button = q("button[type=submit]", form);
+    button.disabled = loading;
+    if (loading) {
+      button.innerHTML = `
+        <span
+          class="spinner-border spinner-border-sm"
+          role="status"
+          aria-hidden="true"></span>
+        Loading...
+      `;
+    } else {
+      button.innerHTML = "Read";
+    }
+  };
+
   const showResults = ({ success, codes, codesByPage }) => {
     if (success) {
       // Fill result rows.
@@ -92,6 +108,7 @@
       const file = fileInput.files[0];
 
       if (isValidPdf(file)) {
+        showLaoder(true);
         newBtn.disabled = true;
         if (barcodeValue === "qrcode") {
           readQR(
@@ -99,6 +116,7 @@
             (results) => {
               showResultsPage(fileInput.files[0].name);
               showResults(results);
+              showLaoder(false);
             },
             showImageResult
           );
@@ -108,12 +126,64 @@
             (results) => {
               showResultsPage(fileInput.files[0].name);
               showResults(results);
+              showLaoder(false);
             },
             showImageResult
           );
         }
       } else if (isValidImage(file)) {
-        // Implement
+        showLaoder(true);
+        newBtn.disabled = true;
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        fetch("/api/file/image-to-pdf", {
+          method: "POST",
+          body: formData,
+        })
+          .then((res) => res.json())
+          .then(({ success, data }) => {
+            if (success) {
+              if (barcodeValue === "qrcode") {
+                readQR(
+                  `/api/file/${data.id}`,
+                  (results) => {
+                    showResultsPage(fileInput.files[0].name);
+                    showResults(results);
+                    showLaoder(false);
+                    // Delete image.
+                    fetch(`/api/file/${data.id}`, {
+                      method: "DELETE",
+                    })
+                      .then((res) => res.json())
+                      .then(console.log)
+                      .catch(console.log);
+                  },
+                  showImageResult
+                );
+              } else {
+                readBarcode(
+                  `/api/file/${data.id}`,
+                  (results) => {
+                    showResultsPage(fileInput.files[0].name);
+                    showResults(results);
+                    showLaoder(false);
+                    // Delete image.
+                    fetch(`/api/file/${data.id}`, {
+                      method: "DELETE",
+                    })
+                      .then((res) => res.json())
+                      .then(console.log)
+                      .catch(console.log);
+                  },
+                  showImageResult
+                );
+              }
+            } else {
+              showAlert("Error with image");
+            }
+          });
       } else {
         showAlert("Invalid format file");
       }
