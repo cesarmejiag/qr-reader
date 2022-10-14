@@ -1,7 +1,8 @@
 const { Router } = require("express");
-const { greetings } = require("../controllers/greetings");
+const { imageToPdf } = require("../controllers/imageToPdf");
+
 const router = Router();
 
-router.get("/", greetings);
+router.get("/", imageToPdf);
 
 module.exports = router;

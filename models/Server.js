@@ -1,7 +1,7 @@
 const express = require("express");
 const fileUpload = require("express-fileupload");
 const bodyParser = require("body-parser");
-const greetingsRouter = require("../routes/greetings");
+const imgToPdfrouter = require("../routes/imageToPdf");
 
 class Server {
   static _instance = null;
@@ -17,7 +17,7 @@ class Server {
     this._app = express();
     this._port = process.env.PORT || 3333;
     this._apiPaths = {
-      greetings: greetingsRouter,
+      "image-to-pdf": imgToPdfrouter,
     };
 
     this._initMiddlewares();

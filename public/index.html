@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9B8GCWE6EH"></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-9B8GCWE6EH"
+    ></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag() {
@@ -100,10 +103,15 @@
               <h2 class="cyborg-color">Results</h2>
               <div>File: <span class="results-name">Cargando...</span></div>
               <div>Pages: <span class="results-pages">Cargando...</span></div>
-              <div>Barcodes: <span class="results-barcodes">Cargando...</span></div>
+              <div>
+                Barcodes: <span class="results-barcodes">Cargando...</span>
+              </div>
             </footer>
             <div class="d-flex justify-content-end">
-              <button type="button" class="btn btn-outline-secondary cyborg-btn-secondary">
+              <button
+                type="button"
+                class="btn btn-outline-secondary cyborg-btn-secondary"
+              >
                 New document
               </button>
             </div>
@@ -111,11 +119,18 @@
         </div>
       </div>
     </div>
+    <!-- Commons -->
     <script src="./js/vendor/pdf.min.js"></script>
+    <!-- QR Reader -->
     <script src="./js/vendor/pdf-qr/jsQR.js"></script>
     <script src="./js/vendor/pdf-qr/pdf-qr.js"></script>
+    <!-- BarcodeR Reader -->
     <script src="./js/vendor/pdf-barcode/quagga.min.js"></script>
     <script src="./js/vendor/pdf-barcode/pdf-barcode.min.js"></script>
+    <!-- App -->
+    <script src="./js/utils.js"></script>
+    <script src="./js/qr-reader.js"></script>
+    <script src="./js/barcode-reader.js"></script>
     <script src="./js/scripts.js"></script>
   </body>
 </html>
