@@ -1,5 +1,7 @@
 - [x] Validar formatos
 - [ ] Notificar a analytics
 - [x] Implementar barcode reader
-- [ ] Convertir imagenes a pdf
-- [ ] Usar pdf convertido para escanear
+- [x] Convertir imagenes a pdf
+- [x] Usar pdf convertido para escanear
+- [ ] Use express-validator
+- [ ] Optimize code
