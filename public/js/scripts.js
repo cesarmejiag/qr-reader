@@ -2,10 +2,34 @@
   // PDFJS.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS.version}/pdf.worker.min.js`;
   PDFJS.GlobalWorkerOptions.workerSrc = `/js/vendor/pdf.worker.min.js`;
 
+  const apiPath = "/api/file";
   const form = q(".form");
   const results = q(".results");
   const resultsList = q(".list", results);
   const newBtn = q("button", results);
+
+  const deleteFile = (id) =>
+    new Promise((res, rej) => {
+      fetch(`${apiPath}/${id}`, {
+        method: "DELETE",
+      })
+        .then((res) => res.json())
+        .then((data) => res())
+        .catch((err) => rej(err));
+    });
+
+  const processPdf = (input, type, callback) => {
+    const onReadEnd = (results) => {
+      showResults(results);
+      typeof callback === "function" && callback();
+    };
+
+    if (type === "qrcode") {
+      readQR(input, onReadEnd, showImageResult);
+    } else {
+      readBarcode(input, onReadEnd, showImageResult);
+    }
+  };
 
   const resetResults = () => {
     q(".results-name", results).innerText = "Cargando...";
@@ -21,13 +45,6 @@
     setTimeout(() => {
       form.removeChild(alert);
     }, 3000);
-  };
-
-  const showForm = () => {
-    log("form", "visibility", "show form");
-    results.classList.add("d-none");
-    form.classList.remove("d-none");
-    resetResults();
   };
 
   const showImageResult = (image, pageNumber) => {
@@ -68,6 +85,7 @@
 
   const showResults = ({ success, codes, codesByPage }) => {
     if (success) {
+      toggleViews("results");
       // Fill result rows.
       let counter = 1;
       codesByPage.forEach((code) => {
@@ -92,94 +110,49 @@
     newBtn.disabled = false;
   };
 
-  const showResultsPage = (fileName) => {
-    form.classList.add("d-none");
-    results.classList.remove("d-none");
-    q(".results-name", results).innerText = fileName;
+  const toggleViews = (view = "form") => {
+    log("form", "visibility", `show ${view}`);
+    if (view === "form") {
+      results.classList.add("d-none");
+      form.classList.remove("d-none");
+      resetResults();
+    } else if (view === "results") {
+      form.classList.add("d-none");
+      results.classList.remove("d-none");
+    }
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
     log("submit", "form", "start");
+
     if (form.checkValidity()) {
-      // log("submit", "form", "valid form");
+      log("submit", "form", "inputs completed");
       const barcodeValue = q("input[name=barcode-input]:checked", form).value;
       const fileInput = q("input[name=file-input]", form);
       const file = fileInput.files[0];
 
-      if (isValidPdf(file)) {
-        showLaoder(true);
-        newBtn.disabled = true;
-        if (barcodeValue === "qrcode") {
-          readQR(
-            fileInput,
-            (results) => {
-              showResultsPage(fileInput.files[0].name);
-              showResults(results);
-              showLaoder(false);
-            },
-            showImageResult
-          );
-        } else {
-          readBarcode(
-            fileInput,
-            (results) => {
-              showResultsPage(fileInput.files[0].name);
-              showResults(results);
-              showLaoder(false);
-            },
-            showImageResult
-          );
-        }
-      } else if (isValidImage(file)) {
-        showLaoder(true);
-        newBtn.disabled = true;
+      q(".results-name", results).innerText = file.name;
 
+      showLaoder(true);
+      newBtn.disabled = true;
+      if (isPdf(file)) {
+        processPdf(fileInput, barcodeValue, () => showLaoder(false));
+      } else if (isImage(file)) {
         const formData = new FormData();
         formData.append("file", file);
 
-        fetch("/api/file/image-to-pdf", {
+        fetch(`${apiPath}/image-to-pdf`, {
           method: "POST",
           body: formData,
         })
           .then((res) => res.json())
           .then(({ success, data }) => {
             if (success) {
-              if (barcodeValue === "qrcode") {
-                readQR(
-                  `/api/file/${data.id}`,
-                  (results) => {
-                    showResultsPage(fileInput.files[0].name);
-                    showResults(results);
-                    showLaoder(false);
-                    // Delete image.
-                    fetch(`/api/file/${data.id}`, {
-                      method: "DELETE",
-                    })
-                      .then((res) => res.json())
-                      .then(console.log)
-                      .catch(console.log);
-                  },
-                  showImageResult
-                );
-              } else {
-                readBarcode(
-                  `/api/file/${data.id}`,
-                  (results) => {
-                    showResultsPage(fileInput.files[0].name);
-                    showResults(results);
-                    showLaoder(false);
-                    // Delete image.
-                    fetch(`/api/file/${data.id}`, {
-                      method: "DELETE",
-                    })
-                      .then((res) => res.json())
-                      .then(console.log)
-                      .catch(console.log);
-                  },
-                  showImageResult
-                );
-              }
+              processPdf(`/api/file/${data.id}`, barcodeValue, () => {
+                showLaoder(false);
+                deleteFile(data.id);
+              });
             } else {
               showAlert("Error with image");
             }
@@ -195,5 +168,5 @@
   };
 
   form.addEventListener("submit", handleSubmit);
-  newBtn.addEventListener("click", showForm);
+  newBtn.addEventListener("click", () => toggleViews("form"));
 })();

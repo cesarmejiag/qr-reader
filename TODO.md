@@ -3,5 +3,5 @@
 - [x] Implementar barcode reader
 - [x] Convertir imagenes a pdf
 - [x] Usar pdf convertido para escanear
-- [ ] Use express-validator
-- [ ] Optimize code
+- [x] Use express-validator
+- [x] Optimize code

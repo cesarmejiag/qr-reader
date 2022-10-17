@@ -66,8 +66,3 @@ body {
 textarea {
   resize: none;
 }
-
-textarea.loading {
-  background: no-repeat center center transparent url("../imgs/loader.svg");
-  background-size: 40px 40px;
-}

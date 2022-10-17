@@ -25,7 +25,7 @@ const log = (...params) => {
  * @param {File} file
  * @returns {boolean}
  */
-const isValidPdf = (file) => {
+const isPdf = (file) => {
   if (file) {
     const allowed = ["pdf"];
     const ext = file.name.match(/\.(.+)/);
@@ -39,7 +39,7 @@ const isValidPdf = (file) => {
  * @param {File} file
  * @returns {boolean}
  */
-const isValidImage = (file) => {
+const isImage = (file) => {
   if (file) {
     const allowed = ["jpg", "jpeg", "png"];
     const ext = file.name.match(/\.(.+)/);
@@ -54,5 +54,5 @@ const isValidImage = (file) => {
  * @returns {boolean}
  */
 const isValidFile = (file) => {
-  return isValidPdf(file) || isValidImage(file);
+  return isPdf(file) || isImage(file);
 };
