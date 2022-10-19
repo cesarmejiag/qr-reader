@@ -9,6 +9,7 @@ class Server {
 
   static getInstance() {
     if (!Server._instance) {
+      console.log("[Server] Creating server instance");
       Server._instance = new Server();
     }
     return Server._instance;
@@ -54,7 +55,7 @@ class Server {
 
   listen() {
     this._app.listen(this._port, () => {
-      console.log(`Webserver listening on port ${this._port}`);
+      console.log(`[Server] Listening on port ${this._port}`);
     });
   }
 }

@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { body, check } = require("express-validator");
+const { check } = require("express-validator");
 const { deleteImage, getImage, imageToPdf } = require("../controllers/file");
 const {
   fileExist,

@@ -14,12 +14,19 @@
         method: "DELETE",
       })
         .then((res) => res.json())
-        .then((data) => res())
-        .catch((err) => rej(err));
+        .then((data) => {
+          res();
+          log("delete", "success", `File deleted ${id}`);
+        })
+        .catch((err) => {
+          rej(err);
+          log("delete", "error", `Can't delete file ${id}`);
+        });
     });
 
   const processPdf = (input, type, callback) => {
     const onReadEnd = (results) => {
+      log("read", "read end", results.success ? "success" : "error");
       showResults(results);
       typeof callback === "function" && callback();
     };
@@ -90,12 +97,15 @@
       let counter = 1;
       codesByPage.forEach((code) => {
         if (code instanceof Array) {
-          const textarea = q(
-            `.result-row:nth-child(${counter++}) textarea`,
-            resultsList
-          );
-          textarea.classList.remove("loading");
-          textarea.value = code.length > 0 ? code[0] : "No se encontró código";
+          const row = q(`.result-row:nth-child(${counter++})`, resultsList);
+          if (code.length > 0) {
+            const textarea = q(`textarea`, row);
+            textarea.classList.remove("loading");
+            textarea.value = code[0];
+            // textarea.value = code.length > 0 ? code[0] : "No se encontró código";
+          } else {
+            row.parentNode.removeChild(row);
+          }
         }
       });
 
@@ -105,7 +115,7 @@
       ).length;
       q(".results-barcodes", results).innerText = codes.length;
     } else {
-      // Show error message.
+      log("form", "error", "Can't show results");
     }
     newBtn.disabled = false;
   };
@@ -136,29 +146,49 @@
 
       showLaoder(true);
       newBtn.disabled = true;
+
+      // Validate file extension.
+      if (!isValidFile(file)) {
+        log("submit", "form", `invalid format file ${file.name}`);
+        showAlert("Invalid format file");
+        showLaoder(false);
+        return;
+      }
+
+      // Validate file size.
+      if (!isValidSize(file.size)) {
+        log("submit", "form", `File size exeeded ${file.size}`);
+        showAlert("File size exeeded.");
+        showLaoder(false);
+        return;
+      }
+
       if (isPdf(file)) {
+        log("read", "pdf", `${file.name}`);
         processPdf(fileInput, barcodeValue, () => showLaoder(false));
-      } else if (isImage(file)) {
+      } else {
+        log("read", "image", `${file.name}`);
         const formData = new FormData();
         formData.append("file", file);
 
+        log("read", "image", `generate pdf ${file.name}`);
         fetch(`${apiPath}/image-to-pdf`, {
           method: "POST",
           body: formData,
         })
           .then((res) => res.json())
-          .then(({ success, data }) => {
+          .then(({ success, data, message }) => {
             if (success) {
+              log("read", "image", `generated pdf ${data.id}.pdf successfully`);
               processPdf(`/api/file/${data.id}`, barcodeValue, () => {
                 showLaoder(false);
                 deleteFile(data.id);
               });
             } else {
+              log("read", "error", `Can't generate pdf of ${file.name}`);
               showAlert("Error with image");
             }
           });
-      } else {
-        showAlert("Invalid format file");
       }
     } else {
       log("submit", "form", "invalid form");

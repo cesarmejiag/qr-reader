@@ -15,7 +15,7 @@ const log = (...params) => {
     const [action, category, label] = params;
     console.log(`[${action}] ${category} - ${label}`);
     if ((action, category, label)) {
-      gtag("event", action, { category, label });
+      // gtag("event", action, { category, label });
     }
   }
 };
@@ -56,3 +56,13 @@ const isImage = (file) => {
 const isValidFile = (file) => {
   return isPdf(file) || isImage(file);
 };
+
+/**
+ * Validate size of a file.
+ * @param {number} size
+ * @param {number} maxSize Size in mb
+ * @returns {boolean}
+ */
+const isValidSize = (size, validSize = 3) => {
+  return size <= validSize * 1024 * 1024;
+}

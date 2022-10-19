@@ -1,5 +1,5 @@
 - [x] Validar formatos
-- [ ] Notificar a analytics
+- [x] Notificar a analytics
 - [x] Implementar barcode reader
 - [x] Convertir imagenes a pdf
 - [x] Usar pdf convertido para escanear
